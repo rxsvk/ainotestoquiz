@@ -1,12 +1,11 @@
 exports.handler = async (event) => {
-
   try {
 
     const body = JSON.parse(event.body || "{}");
     const topic = body.topic || "general knowledge";
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: {
@@ -17,7 +16,7 @@ exports.handler = async (event) => {
             {
               parts: [
                 {
-                  text: `Create 5 MCQ quiz questions about ${topic}. Format as JSON array with question, options, and answer.`
+                  text: `Generate 5 multiple choice quiz questions about ${topic}. Show question, 4 options, and correct answer.`
                 }
               ]
             }
@@ -28,8 +27,16 @@ exports.handler = async (event) => {
 
     const data = await response.json();
 
-    const text =
-      data.candidates?.[0]?.content?.parts?.[0]?.text || "No quiz generated";
+    let text = "No quiz generated";
+
+    if (data.candidates &&
+        data.candidates[0] &&
+        data.candidates[0].content &&
+        data.candidates[0].content.parts &&
+        data.candidates[0].content.parts[0]) {
+
+        text = data.candidates[0].content.parts[0].text;
+    }
 
     return {
       statusCode: 200,
@@ -46,5 +53,4 @@ exports.handler = async (event) => {
     };
 
   }
-
 };
