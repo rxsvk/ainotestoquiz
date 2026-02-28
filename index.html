@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>AI Quiz Generator</title>
+</head>
+
+<body>
+
+<h2>AI Quiz Generator</h2>
+
+<input id="topic" placeholder="Enter topic (biology, history etc)">
+<button onclick="generateQuiz()">Generate Quiz</button>
+
+<pre id="output"></pre>
+
+<script>
+async function generateQuiz() {
+
+  const topic = document.getElementById("topic").value;
+  const output = document.getElementById("output");
+
+  output.innerText = "Generating quiz...";
+
+  try {
+
+    const res = await fetch("/.netlify/functions/quiz", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ topic })
+    });
+
+    const data = await res.json();
+
+    output.innerText = data.quiz;
+
+  } catch (err) {
+
+    output.innerText = "Error generating quiz";
+
+  }
+
+}
+</script>
+
+</body>
+</html>
